@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0f0d;
+  --surface: #0f1712;
+  --card: #131e16;
+  --border: #1e2d22;
+  --primary: #22c55e;
+  --text-primary: #e8f0ea;
+  --text-secondary: #7a9a80;
+  --text-muted: #4a6650;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* RainbowKit overrides */
+[data-rk] {
+  --rk-colors-accentColor: #22c55e;
+  --rk-colors-accentColorForeground: #0a0f0d;
+  --rk-colors-actionButtonBorder: #1e2d22;
+  --rk-colors-actionButtonBorderMobile: #1e2d22;
+  --rk-colors-actionButtonSecondaryBackground: #0f1712;
+  --rk-colors-closeButton: #7a9a80;
+  --rk-colors-closeButtonBackground: #131e16;
+  --rk-colors-connectButtonBackground: #131e16;
+  --rk-colors-connectButtonBackgroundError: #1a0808;
+  --rk-colors-connectButtonInnerBackground: #0f1712;
+  --rk-colors-connectButtonText: #e8f0ea;
+  --rk-colors-connectButtonTextError: #ef4444;
+  --rk-colors-connectionIndicator: #22c55e;
+  --rk-colors-downloadBottomCardBackground: #131e16;
+  --rk-colors-downloadTopCardBackground: #0f1712;
+  --rk-colors-error: #ef4444;
+  --rk-colors-generalBorder: #1e2d22;
+  --rk-colors-generalBorderDim: #1e2d22;
+  --rk-colors-menuItemBackground: #0f1712;
+  --rk-colors-modalBackground: #131e16;
+  --rk-colors-modalBorder: #1e2d22;
+  --rk-colors-modalText: #e8f0ea;
+  --rk-colors-modalTextDim: #7a9a80;
+  --rk-colors-modalTextSecondary: #7a9a80;
+  --rk-colors-profileAction: #0f1712;
+  --rk-colors-profileActionHover: #131e16;
+  --rk-colors-profileForeground: #131e16;
+  --rk-colors-selectedOptionBorder: #22c55e;
+  --rk-colors-standby: #eab308;
+}
+
+/* Focus visible */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selection */
+::selection {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--text-primary);
+}
