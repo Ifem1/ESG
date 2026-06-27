@@ -188,9 +188,9 @@ export function EvidenceForm({ caseId }: EvidenceFormProps) {
       <Button
         type="submit"
         className="w-full"
-        disabled={!isConnected || isPending || (txState.status !== 'idle' && txState.status !== 'SUCCESS' && txState.status !== 'FAILED_EXECUTION' && txState.status !== 'VALIDATORS_TIMEOUT') || !!urlError || !form.url_hash}
+        disabled={!isConnected || isPending || (['PENDING','PROPOSING','COMMITTING','REVEALING'].includes(txState.status as string)) || !!urlError || !form.url_hash}
       >
-        {(isPending || (txState.status !== 'idle' && txState.status !== 'SUCCESS' && txState.status !== 'FAILED_EXECUTION' && txState.status !== 'VALIDATORS_TIMEOUT' && txState.status !== 'LEADER_TIMEOUT')) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+        {(isPending || ['PENDING','PROPOSING','COMMITTING','REVEALING'].includes(txState.status as string)) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
         Submit Evidence
       </Button>
     </form>
