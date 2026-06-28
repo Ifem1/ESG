@@ -122,8 +122,8 @@ The consensus method is intentionally compact — prompts are kept under 800 tok
 ### Install & Run
 
 ```bash
-git clone https://github.com/Ifem1/ESG-Oracle.git
-cd ESG-Oracle
+git clone https://github.com/Ifem1/ESG.git
+cd ESG
 npm install
 ```
 
