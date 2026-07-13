@@ -111,3 +111,21 @@ export async function contractWrite(
 
   return hash as `0x${string}`
 }
+
+export async function waitForFinalizedTransaction(hash: `0x${string}`): Promise<void> {
+  // SDK brands transaction hashes/status enums more narrowly than writeContract's public return type.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const client = getReadClient() as any
+  const tx = await client.waitForTransactionReceipt({
+    hash,
+    status: 'FINALIZED',
+    interval: 2500,
+    retries: 240,
+  })
+  if (tx.statusName !== 'FINALIZED') {
+    throw new Error(`Transaction did not finalize (status: ${tx.statusName ?? 'unknown'}).`)
+  }
+  if (tx.txExecutionResultName === 'FINISHED_WITH_ERROR' || tx.resultName === 'FAILURE') {
+    throw new Error('The finalized transaction failed during contract execution.')
+  }
+}

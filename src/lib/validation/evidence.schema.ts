@@ -22,7 +22,26 @@ export const evidenceSchema = z.object({
   url: z
     .string()
     .url('Must be a valid URL')
-    .max(2000, 'URL must be under 2000 characters'),
+    .max(1000, 'URL must be under 1000 characters')
+    .superRefine((value, ctx) => {
+      try {
+        const parsed = new URL(value)
+        const host = parsed.hostname.toLowerCase().replace(/\.$/, '')
+        const privateHost =
+          parsed.protocol !== 'https:' ||
+          parsed.username !== '' || parsed.password !== '' ||
+          host === 'localhost' || host.endsWith('.localhost') ||
+          host === '0.0.0.0' || host === '::1' ||
+          /^127\./.test(host) || /^10\./.test(host) ||
+          /^169\.254\./.test(host) || /^192\.168\./.test(host) ||
+          /^172\.(1[6-9]|2\d|3[01])\./.test(host)
+        if (privateHost) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Use a public HTTPS URL without credentials' })
+        }
+      } catch {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Must be a valid public HTTPS URL' })
+      }
+    }),
   url_hash: z.string().min(1, 'URL hash is required'),
   source_name: z
     .string()

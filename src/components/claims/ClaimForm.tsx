@@ -23,7 +23,8 @@ import { useCreateCase, useAddEvidence } from '@/hooks/useContract'
 import { hashUrl } from '@/lib/utils/hash'
 import { evidenceSchema, type EvidenceSchemaType } from '@/lib/validation/evidence.schema'
 import { EVIDENCE_TYPES, EVIDENCE_CATEGORIES } from '@/lib/constants/categories'
-import { getCaseCount } from '@/lib/genlayer/contract'
+import { getCasesByOwner } from '@/lib/genlayer/contract'
+import { waitForFinalizedTransaction } from '@/lib/genlayer/client'
 import { cn } from '@/lib/utils/cn'
 
 const STEPS = ['Case Info', 'Evidence', 'Review & Submit']
@@ -110,17 +111,23 @@ export function ClaimForm() {
     setSubmitLog([])
 
     try {
-      // 1. Read current case count — new case ID will equal this value
-      log('Reading current case count…')
-      const countBefore = await getCaseCount()
-      const expectedCaseId = countBefore
+      const existingCases = await getCasesByOwner(address!)
+      const existingIds = new Set(existingCases.map((item) => String(item.id)))
 
       // 2. Create the case
       setSubmitPhase('creating')
       log('Submitting case — approve in your wallet…')
-      await createCase(data)
-      setNewCaseId(expectedCaseId)
-      log(`Case #${expectedCaseId} submitted ✓`)
+      const createHash = await createCase(data)
+      log('Waiting for case transaction finalization…')
+      await waitForFinalizedTransaction(createHash)
+      const confirmedCases = await getCasesByOwner(address!)
+      const confirmedCase = confirmedCases.find(
+        (item) => !existingIds.has(String(item.id)) && item.title === data.title && item.company === data.company
+      )
+      if (!confirmedCase) throw new Error('Finalized case ID could not be confirmed on-chain.')
+      const confirmedCaseId = String(confirmedCase.id)
+      setNewCaseId(Number(confirmedCaseId))
+      log(`Case #${confirmedCaseId} finalized and confirmed ✓`)
 
       // 3. Submit each evidence entry
       const validEvidence = evidenceEntries.filter(
@@ -132,7 +139,7 @@ export function ClaimForm() {
         for (let i = 0; i < validEvidence.length; i++) {
           const ev = validEvidence[i]
           log(`Submitting evidence ${i + 1}/${validEvidence.length} — approve in your wallet…`)
-          await addEvidence(String(expectedCaseId), {
+          const evidenceHash = await addEvidence(confirmedCaseId, {
             title: ev.title ?? '',
             ev_type: ev.ev_type ?? 'other',
             url: ev.url ?? '',
@@ -142,7 +149,8 @@ export function ClaimForm() {
             relevance: ev.relevance ?? '',
             category: ev.category ?? 'supporting',
           })
-          log(`Evidence ${i + 1} submitted ✓`)
+          await waitForFinalizedTransaction(evidenceHash)
+          log(`Evidence ${i + 1} finalized ✓`)
         }
       }
 
