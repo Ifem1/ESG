@@ -22,6 +22,14 @@ All requested changes have been implemented.
 - Validators reject conclusions that invent, misstate, or contradict the retrieved evidence.
 - The live World Bank test produced `SUPPORTED` with 98% confidence and `HIGH` data quality after validators read the submitted source.
 
+### Nondeterministic storage isolation
+
+- All case and evidence storage reads occur before entering the nondeterministic function.
+- The validator closure captures only plain strings, lists, and enum sets; it no longer references `self`, `case`, `TreeMap`, or the contract storage class.
+- The storage-safe upgrade finalized on StudioNet.
+- A post-upgrade consensus transaction finalized without the `Detected pickling storage class` or `Reading storage in nondet mode is not supported` warnings.
+- Post-upgrade verification transaction: `0xa27a4551dc044227de4d80803b49912dab14f37cc5d9ad1dfed478069a81af2c`
+
 ### Case and evidence transaction ordering
 
 - The frontend waits for the case transaction to reach `FINALIZED` before continuing.
