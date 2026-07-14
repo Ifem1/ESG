@@ -1,4 +1,4 @@
-import { createClient } from 'genlayer-js'
+import { createAccount, createClient } from 'genlayer-js'
 import { studionet } from 'genlayer-js/chains'
 
 const address = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x4F7ab175196A9C3B3EA475B492f76B8312Ba6e36'
@@ -26,10 +26,17 @@ if (!process.argv.includes('--writes')) {
 }
 
 const modulePath = process.env.GENLAYER_PROVIDER_MODULE
-if (!modulePath) throw new Error('Set GENLAYER_PROVIDER_MODULE to an untracked module exporting provider and account.')
-const { provider, account } = await import(modulePath)
-if (!provider || !account) throw new Error('Provider module must export provider and account.')
-const writer = createClient({ chain: studionet, endpoint, provider, account })
+let provider
+let account
+if (modulePath) {
+  ({ provider, account } = await import(modulePath))
+  if (!provider || !account) throw new Error('Provider module must export provider and account.')
+} else if (process.env.GENLAYER_PRIVATE_KEY) {
+  account = createAccount(process.env.GENLAYER_PRIVATE_KEY)
+} else {
+  throw new Error('Set GENLAYER_PRIVATE_KEY or GENLAYER_PROVIDER_MODULE for write mode.')
+}
+const writer = createClient({ chain: studionet, endpoint, ...(provider ? { provider } : {}), account })
 const tx = async (functionName, args) => {
   const hash = await writer.writeContract({ address, functionName, args, value: BigInt(0) })
   return writer.waitForTransactionReceipt({ hash, status: 'FINALIZED', interval: 2500, retries: 240 })
