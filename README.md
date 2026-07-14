@@ -27,7 +27,7 @@ ESG Oracle is a full-stack Web3 application that lets anyone submit Environmenta
 - **Consensus:** `gl.eq_principle.prompt_non_comparative` — validators check the leader's verdict against structural criteria instead of independently re-running the LLM (prevents UNDETERMINED on subjective ESG tasks)
 - **Non-determinism:** `gl.nondet.exec_prompt` (LLM calls) + `gl.nondet.get_webpage` (live evidence fetching)
 - **Storage:** `TreeMap[str, str]` with JSON-encoded values; all keys coerced to `str` to prevent int/string mismatch errors
-- **Contract address (StudioNet):** `0x5fb01C394d28134dB653851d4264f3DCB9CE1A87`
+- **Contract address (StudioNet):** `0x4F7ab175196A9C3B3EA475B492f76B8312Ba6e36`
 
 ### Frontend
 - **Framework:** Next.js 14 (App Router, `'use client'`)
@@ -130,7 +130,7 @@ npm install
 Create `.env.local`:
 
 ```env
-NEXT_PUBLIC_CONTRACT_ADDRESS=0x5fb01C394d28134dB653851d4264f3DCB9CE1A87
+NEXT_PUBLIC_CONTRACT_ADDRESS=0x4F7ab175196A9C3B3EA475B492f76B8312Ba6e36
 NEXT_PUBLIC_GENLAYER_RPC_URL=https://studio.genlayer.com/api
 NEXT_PUBLIC_EXPLORER_URL=https://studio.genlayer.com
 NEXT_PUBLIC_CHAIN_ID=61999
@@ -148,6 +148,25 @@ npm run dev
 
 ### Deploy Contract
 Open `contract/esg_oracle.py` in [GenLayer Studio](https://studio.genlayer.com), deploy, and update `NEXT_PUBLIC_CONTRACT_ADDRESS` in `.env.local`.
+
+### Reproducible SDK smoke check
+
+From a fresh checkout, install the lockfile-pinned dependencies and run:
+
+```bash
+npm ci
+npm run smoke:contract
+```
+
+The check uses `genlayer-js` **exactly at v1.1.8**, reads the submitted contract schema, verifies the `create_case`, `add_evidence`, and `request_consensus_review` write methods plus the case/evidence/verdict read methods, and calls the read methods against the active contract. It requires no private key.
+
+To exercise the write methods as well, provide an EIP-1193 provider and account through a local, untracked module:
+
+```bash
+GENLAYER_PROVIDER_MODULE=./private/provider.mjs npm run smoke:contract -- --writes
+```
+
+The provider module must export `{ provider, account }`; never commit that file or a private key.
 
 ---
 

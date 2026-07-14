@@ -1,6 +1,6 @@
 export const CONTRACT_ADDRESS =
   (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`) ||
-  '0x5fb01C394d28134dB653851d4264f3DCB9CE1A87'
+  '0x4F7ab175196A9C3B3EA475B492f76B8312Ba6e36'
 
 export const GENLAYER_RPC_URL =
   process.env.NEXT_PUBLIC_GENLAYER_RPC_URL || 'https://studio.genlayer.com/api'
